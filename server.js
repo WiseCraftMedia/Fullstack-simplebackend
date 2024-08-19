@@ -2,13 +2,13 @@ let express = require("express")
 let { MongoClient, ObjectId } = require("mongodb")
 let app = express()
 let db
+const uri =
+  "mongodb+srv://spritethirstman:SuperSimpleSyrupSlurpsSloppily@clusterfuck.lypazcb.mongodb.net/simplestack?retryWrites=true&w=majority&appName=Clusterfuck"
 
 app.use(express.static("public"))
 
 async function go() {
-  let client = new MongoClient(
-    "mongodb+srv://spritethirstman:SuperSimpleSyrupSlurpsSloppily@clusterfuck.lypazcb.mongodb.net/simplestack?retryWrites=true&w=majority&appName=Clusterfuck"
-  )
+  let client = new MongoClient(uri)
   try {
     await client.connect()
     db = client.db("simplestack")
@@ -48,7 +48,10 @@ app.get("/", async (req, res) => {
           .map(punch => {
             return `<li class="item">
           <p>${punch.text}</p>
-          <button data-stringId='${punch._id}' class="edit">Edit</button><button class="delete">Delete</button>
+          <button data-timestamp='${() =>
+            ObjectId.createFromTime(
+              parseInt(timestamp, 10)
+            )}' class="edit">Edit</button><button class="delete">Delete</button>
         </li>`
           })
           .join("")}
@@ -84,32 +87,18 @@ app.post("/test", (req, res) => {
 
 app.post("/change-punch", async (req, res) => {
   try {
-    const { stringId, punch } = req.body
+    const { timestamp, punch } = req.body
+    const updateDoc = { $set: { text: punch } }
+    const objectId = ObjectId.createFromTime(parseInt(timestamp, 10))
+    const docId = { _id: objectId }
+
     console.log("Received data:", req.body)
-
-    // Direct conversion from string to ObjectId
-    console.log(stringId)
-    let objectId
-    try {
-      objectId = new ObjectId(stringId) // Convert the received ID to ObjectId
-      console.log(objectId)
-      console.log(ObjectId)
-    } catch (e) {
-      return res.status(400).send("Invalid ID format")
-    }
-
-    console.log("Attempting to update document with ID:", objectId)
-
-    // Attempt to update the document
-    const result = await db
-      .collection("simplestack")
-      .updateOne({ _id: objectId }, { $set: { text: punch } })
-
+    const result = await db.collection("simplestack").findOneAndUpdate(docId, updateDoc)
     console.log("Update result:", result)
 
-    if (result.matchedCount === 0) {
-      return res.status(404).send("Document not found")
-    }
+    // if (result.matchedCount === 0) {
+    //   return res.status(404).send("Document not found")
+    // }
 
     res.send("Edits approved")
   } catch (err) {
