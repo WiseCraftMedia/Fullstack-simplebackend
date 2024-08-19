@@ -1,0 +1,33 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="simple.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="page">
+      <h1>Punchy!</h1>
+      <div class="punch">
+        <form action="/punch" method="POST">
+          <label><input autofocus name="punch" /><button>Add new item</button></label>
+        </form>
+      </div>
+    </div>
+    <div class="listbox">
+      <ul class="list">
+        <li class="item">
+          <p>Walkuh da dug!</p>
+          <button class="edit">Edit</button><button class="delete">Delete</button>
+        </li>
+        <li class="item">
+          <p>Lasgna for Garfield</p>
+          <button class="edit">Edit</button><button class="delete">Delete</button>
+        </li>
+      </ul>
+    </div>
+    <div class="test">
+      <button class="test-local" data-_id>Check Local</button><button class="test-network"></button>
+    </div>
+  </body>
+</html>
