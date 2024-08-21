@@ -1,17 +1,20 @@
 let express = require("express")
 let { MongoClient, ObjectId } = require("mongodb")
+
 let app = express()
 let db
-const uri =
-  "mongodb+srv://spritethirstman:SuperSimpleSyrupSlurpsSloppily@clusterfuck.lypazcb.mongodb.net/simplestack?retryWrites=true&w=majority&appName=Clusterfuck"
+
+require("dotenv").config()
+
+const mongoUri = process.env.MONGO_URI
 
 app.use(express.static("public"))
 
 async function go() {
-  let client = new MongoClient(uri)
+  let client = new MongoClient(mongoUri)
   try {
     await client.connect()
-    db = client.db("simplestack")
+    db = client.db()
     app.listen(3000)
   } catch (e) {
     console.log(e)
@@ -46,13 +49,13 @@ app.get("/", async (req, res) => {
       <ul class='list'>
         ${punches
           .map(punch => {
-            return `<li class="item">
-          <p>${punch.text}</p>
-          <button data-timestamp='${() =>
-            ObjectId.createFromTime(
-              parseInt(timestamp, 10)
-            )}' class="edit">Edit</button><button class="delete">Delete</button>
-        </li>`
+            return `<li class="fist">
+          <span class='single-punch'>${punch.text}</span>
+            <div>
+                      <button data-id='${punch._id}' class="edit">Edit</button><button data-id='${punch._id}' class="delete">Delete</button>
+
+            </div>
+          </li>`
           })
           .join("")}
       </ul>
@@ -87,13 +90,10 @@ app.post("/test", (req, res) => {
 
 app.post("/change-punch", async (req, res) => {
   try {
-    const { timestamp, punch } = req.body
-    const updateDoc = { $set: { text: punch } }
-    const objectId = ObjectId.createFromTime(parseInt(timestamp, 10))
-    const docId = { _id: objectId }
-
     console.log("Received data:", req.body)
-    const result = await db.collection("simplestack").findOneAndUpdate(docId, updateDoc)
+    const result = await db
+      .collection("punches")
+      .findOneAndUpdate({ _id: new ObjectId(req.body.id) }, { $set: { text: req.body.punch } })
     console.log("Update result:", result)
 
     // if (result.matchedCount === 0) {
@@ -101,6 +101,18 @@ app.post("/change-punch", async (req, res) => {
     // }
 
     res.send("Edits approved")
+  } catch (err) {
+    console.error("Error during database operation:", err)
+    res.status(500).send("Error updating document")
+  }
+})
+
+app.post("/feint-punch", async (req, res) => {
+  try {
+    console.log("Received data:", req.body)
+    const result = await db.collection("punches").deleteOne({ _id: new ObjectId(req.body.id) })
+    console.log("Update result:", result)
+    res.redirect("/")
   } catch (err) {
     console.error("Error during database operation:", err)
     res.status(500).send("Error updating document")

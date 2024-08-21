@@ -40,10 +40,15 @@ button {
   border-radius: 4px;
 }
 
+li div {
+  float: right;
+  width: 25%;
+}
+
 ul.list {
   padding: 0;
   list-style: none;
-  text-align: center;
+  /* text-align: center; */
   border: 1px solid lightgray;
   border-radius: 4px;
 }
@@ -54,23 +59,16 @@ ul.list {
   margin-right: auto;
 }
 
-.item p {
-  float: left;
-
-  text-align: left;
-  width: 66%;
-  margin: 0;
+.fist {
 }
 
 .edit {
   background-color: darkgrey;
+  float: left;
 }
 
 .delete {
   background-color: red;
-  text-align: right;
-}
-.delete .edit {
   float: right;
 }
 
@@ -96,6 +94,10 @@ button.test-local {
   color: white;
   border: none;
 }
+/* 
+span.single-punch {
+  float: left;
+} */
 
 .test {
   text-align: center;

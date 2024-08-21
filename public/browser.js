@@ -1,42 +1,35 @@
 document.addEventListener("click", e => {
   if (e.target.classList.contains("edit")) {
-    const punch = prompt("New punch?")
-    const timestamp = Math.floor(new Date().getTime() / 1000)
+    const punch = prompt(
+      "New punch?",
+      e.target.parentElement.parentElement.querySelector(".single-punch").innerHTML
+    )
+    const id = { id: e.target.getAttribute("data-id") }
 
-    axios
-      .post("/change-punch", { timestamp, punch }) // Use 'id' consistently
-      .then(() => {
-        // Do something interesting here
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    if (punch) {
+      axios
+        .post("/change-punch", { punch, id: e.target.getAttribute("data-id") })
+        .then(() => {
+          e.target.parentElement.parentElement.querySelector(".single-punch").innerHTML = punch
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    }
   }
 })
 
 document.addEventListener("click", e => {
-  if (e.target.classList.contains("test-local")) {
-    axios
-      .post("/test", { _id: e.target.getAttribute("data-_id") })
-      .then(() => {
-        console.log("Test route called successfully")
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
-})
-
-document.addEventListener("click", e => {
-  if (e.target.classList.contains("test-network")) {
-    let edits = prompt("New punch?")
-    axios
-      .post("/db-check", { punch: edits, _id: e.target.getAttribute("data-_id") })
-      .then(() => {
-        // do something interesting here
-      })
-      .catch(err => {
-        console.log(err)
-      })
+  if (e.target.classList.contains("delete")) {
+    if (confirm("u extra extra sure????")) {
+      axios
+        .post("/feint-punch", { id: e.target.getAttribute("data-id") })
+        .then(() => {
+          e.target.parentElement.parentElement.remove()
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    }
   }
 })
